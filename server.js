@@ -13,6 +13,7 @@ const productRoute = require("./routes/productRoute");
 const userRoute = require("./routes/userRoute");
 const authRoute = require("./routes/authRoute");
 const reviewRoute = require("./routes/reviewRoute");
+const wishlistRoute = require("./routes/wishlistRoute");
 const { log } = require('console');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/v1/products", productRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/reviews", reviewRoute);
+app.use("/api/v1/wishlist", wishlistRoute);
 
 //404 error if not found page
 app.all('*', (req,res,next) => {

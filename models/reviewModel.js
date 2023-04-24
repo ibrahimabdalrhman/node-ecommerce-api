@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose');
-const monogoose = require('mongoose');
+const monogoose = require("mongoose").set("strictQuery", false);;
 const Product = require('./productModel');
+
 const reviewsSchema = new mongoose.Schema(
   {
     title: {
@@ -48,9 +49,9 @@ reviewsSchema.statics.clacAvgAndQuantity = async function (productId) {
     });
     
   } else {
-    await Product.findByIdAndUpdate(productId,{
-      ratingsQuantity:0,
-      ratingsQuantity: 0
+    await Product.findByIdAndUpdate(productId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 0,
     });
   }
 };

@@ -52,7 +52,21 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: Date,
     ResetCode: String,
     ResetCodeExpireAt: Date,
-    ResetCodeVerified:Boolean,
+    ResetCodeVerified: Boolean,
+    wishlist:[ {
+      type: mongoose.Schema.ObjectId,
+      ref:"Product"
+    }],
+    addresses: [
+      {
+        id: mongoose.Schema.ObjectId,
+        alias: String,
+        detalis: String,
+        phone: String,
+        city: String,
+        postalCode:String
+      }
+    ]
   },
   { timestamps: true }
 );
