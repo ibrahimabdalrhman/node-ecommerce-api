@@ -23,10 +23,11 @@ exports.removeAddress = asyncHandler(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(
     req.user._id,
     {
-      $pull: { addresses: {_id: req.params.id } },
+      $pull: { addresses: { _id: req.params.id } },
     },
     { new: true }
   );
+
   res.status(200).json({
     status: "success",
     message: "address deleted successfully",
