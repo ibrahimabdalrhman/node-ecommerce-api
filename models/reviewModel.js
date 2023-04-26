@@ -1,5 +1,6 @@
 const { default: mongoose } = require('mongoose');
-const monogoose = require("mongoose").set("strictQuery", false);;
+const monogoose = require("mongoose");
+mongoose.set("strictQuery", true);
 const Product = require('./productModel');
 
 const reviewsSchema = new mongoose.Schema(
