@@ -45,14 +45,22 @@ exports.auth = asyncHandler(async (req, res, next) => {
   if (!token) {
     return next(new ApiError("you must login 2", 401));
   }
-  const decoded = jwt.verify(token, process.env.JWT_KEY);
-  // Check whether the decoded userId is stored in the database.
-  const currentUser = await User.findById(decoded.userId);
-  if (!currentUser) {
-    return next(new ApiError("you must login 3", 401));
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_KEY);
+    // Check whether the decoded userId is stored in the database.
+    const currentUser = await User.findById(decoded.userId);
+    if (!currentUser) {
+      return next(new ApiError("you must login 3", 401));
+    }
+    req.user = currentUser;
+    next();
+  } catch (err) {
+    if (err instanceof jwt.JsonWebTokenError) {
+      return next(new ApiError("you are not login", 401));
+    }
+    next(err);
   }
-  req.user = currentUser;
-  next();
 });
 
 //Authorization permissions
@@ -167,3 +175,11 @@ exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
   next();
 });
 
+exports.logout = asyncHandler(async (req, res, next) => {
+  // Clear the token by setting it to an invalid value
+  res.cookie("token", "invalid-token", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.status(200).json({ success: true, message: "Logged out" });
+});

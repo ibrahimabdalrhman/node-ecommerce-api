@@ -23,6 +23,12 @@ router
         loginValidator,
         authService.login
 );
+
+router
+    .route("/logout")
+    .get(
+        authService.logout
+);
     
 router
     .route("/forgetpassword")
