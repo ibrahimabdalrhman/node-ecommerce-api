@@ -3,15 +3,16 @@ const Product = require("../models/productModel");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/apiError");
 const ApiFeatures = require("../utils/apiFeatures");
+const Coupon = require('../models/couponModel');
 
 const calcTotalCartPrice = (cart) => {
-  let totalPrice = 0;
+  let total = 0;
   cart.cartItems.forEach((item) => {
-    totalPrice += item.quantity * item.price;
+    total += item.quantity * item.price;
   });
-  cart.totalPrice = totalPrice;
+  cart.totalPrice = total;
   cart.totalPriceAfterDiscount = undefined;
-  return totalPrice;
+  return total;
 };
 
 exports.addProductToCart = asyncHandler(async (req, res, next) => {
@@ -119,4 +120,27 @@ exports.updateProductQuantity = asyncHandler(async (req, res, next) => {
   } else {
     return next(new ApiError("can't find product in cart", 404));
   }
+});
+
+exports.applyCoupon = asyncHandler(async (req, res, next) => {
+  const coupon = await Coupon.findOne({ name: req.body.coupon, expire: { $gt: Date.now() } });
+  if (!coupon) {
+    return next(new ApiError("coupon invalied or expired ", 404));
+  }
+  const cart = await Cart.findOne({ user: req.user._id });
+    if (!cart) {
+      return next(new ApiError("Cart Not Found", 404));
+  }
+  
+  const totalPrice = calcTotalCartPrice(cart);
+
+  const totalPriceAfterDiscount = (totalPrice - (totalPrice * coupon.discount) / 100).toFixed(2);
+  cart.totalPriceAfterDiscount = totalPriceAfterDiscount;
+  await cart.save();
+
+  res.status(201).json({
+    status: "success",
+    message: `You are now enjoying a ${coupon.discount}% discount.`,
+    data: cart,
+  });
 });

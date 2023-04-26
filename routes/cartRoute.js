@@ -16,4 +16,6 @@ router
   .put(cartService.updateProductQuantity)
   .delete(cartService.removeProductFromCart);
 
+router.route("/coupon").post(cartService.applyCoupon);
+
 module.exports = router;
