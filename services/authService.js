@@ -39,11 +39,11 @@ exports.login = asyncHandler(async (req, res, next) => {
 //to check if user loggedin
 exports.auth = asyncHandler(async (req, res, next) => {
   if (!req.headers.authorization) {
-    return next(new ApiError("you must login 1", 401));
+    return next(new ApiError("you must login to access this route ", 401));
   }
   const token = req.headers.authorization.split(" ")[1];
   if (!token) {
-    return next(new ApiError("you must login 2", 401));
+    return next(new ApiError("you must login to access this route ", 401));
   }
 
   try {
@@ -51,13 +51,13 @@ exports.auth = asyncHandler(async (req, res, next) => {
     // Check whether the decoded userId is stored in the database.
     const currentUser = await User.findById(decoded.userId);
     if (!currentUser) {
-      return next(new ApiError("you must login 3", 401));
+      return next(new ApiError("you must login to access this route ", 401));
     }
     req.user = currentUser;
     next();
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError) {
-      return next(new ApiError("you are not login", 401));
+      return next(new ApiError("you must login to access this route ", 401));
     }
     next(err);
   }
