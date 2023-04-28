@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
+const cors = require("cors");
+const compression = require("compression");
 dotenv.config({ path: 'config.env' });
 const dbConnection = require('./config/database');
 const ApiError = require("./utils/apiError");
@@ -10,6 +12,14 @@ require('mongoose').set('strictQuery', false);
 const app = express();
 dbConnection();
 app.use(express.json());
+
+//enable others domans to access your api
+app.use(cors());
+app.options("*", cors());
+
+//compress all responses
+app.use(compression());
+
 app.use(express.static(path.join(__dirname, 'uploads')));
 console.log("mode : ", process.env.NODE_ENV);
 
