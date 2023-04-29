@@ -140,7 +140,9 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   console.log("webhookCheckout 1");
+
   const sig = req.headers["stripe-signature"];
+  console.log("sig : ",sig);
 
   let event;
 
@@ -150,7 +152,7 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-    console.log(event);
+    console.log("event : ",event);
   } catch (err) {
     res.status(400).send(`Webhook Error: ${err.message}`);
     return;
