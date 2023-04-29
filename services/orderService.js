@@ -139,33 +139,25 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 });
 
 exports.webhookCheckout = async (req, res) => {
-  console.log("webhookCheckout 1");
-
   const sig = req.headers["stripe-signature"];
-  console.log("sig : ", sig);
 
   let event;
 
   try {
-    console.log("in try");
-    console.log("body : ", req.body);
-
     event = stripe.webhooks.constructEvent(
-      Buffer.from(JSON.stringify(req.body), "base64").toString("utf8"),
+      req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-
-    console.log("event : ", event);
   } catch (err) {
-    console.log("ERROR ==>> ", err.message);
+    console.log(err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === "checkout.session.completed") {
 
     console.log("create order here.................");
-    console.log("cartId : ",event.data.object.client_reference_id);
+    console.log("cartId : ", event.data.object.client_reference_id);
 
     const cart = await Cart.findById(event.data.object.client_reference_id);
     if (!cart) {
@@ -196,7 +188,7 @@ exports.webhookCheckout = async (req, res) => {
       await Cart.findByIdAndDelete(event.data.object.client_reference_id);
     }
     console.log("order : ", order);
-  res.status(200).json({ received: "success" });
+    res.status(200).json({ received: "success" });
   }
 
 };
