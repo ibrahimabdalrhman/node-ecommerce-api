@@ -9,7 +9,6 @@ const ApiError = require("./utils/apiError");
 const errorMiddleware = require('./middlewares/errorMiddleware');
 require('mongoose').set('strictQuery', false);
 const { webhookCheckout } = require('./services/orderService');
-const bodyParser = require("body-parser");
 
 const app = express();
 dbConnection();
