@@ -142,57 +142,61 @@ exports.webhookCheckout = async (req, res) => {
   console.log("webhookCheckout 1");
 
   const sig = req.headers["stripe-signature"];
-  console.log("sig : ",sig);
+  console.log("sig : ", sig);
 
   let event;
 
   try {
     console.log("in try");
+
+
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
-      "whsec_ZbTMDNlfx2xNl7W1FEe8zO18B4WS4zEG"
+      'whsec_ZbTMDNlfx2xNl7W1FEe8zO18B4WS4zEG'
     );
-    console.log("event : ",event);
+    console.log("event : ", event);
   } catch (err) {
-    console.log("ERROR =>",err);
+    console.log("ERROR ==>> ", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === "checkout.session.completed") {
+
     console.log("create order here.................");
+
     //create order
-    //   const cart = await Cart.findById(event.data.object.client_reference_id);
-    //   if (!cart) {
-    //     return next(new ApiError("Cart Not Found", 404));
-    //   }
-    //   const user = await User.findOne({
-    //     email: event.data.object.customer_email,
-    //   });
-    //   const order = await Order.create({
-    //     user: user._id,
-    //     cartItems: cart.cartItems,
-    //     shippingAddress: event.data.object.metadata,
-    //     totalOrderPrice: event.data.object.amount_total / 100,
-    //     paymentMethodtype: "card",
-    //     isPaid: true,
-    //     paidAt: Date.now(),
-    //   });
-    //   if (order) {
+    const cart = await Cart.findById(event.data.object.client_reference_id);
+    if (!cart) {
+      return next(new ApiError("Cart Not Found", 404));
+    }
+    const user = await User.findOne({
+      email: event.data.object.customer_email,
+    });
+    const order = await Order.create({
+      user: user._id,
+      cartItems: cart.cartItems,
+      shippingAddress: event.data.object.metadata,
+      totalOrderPrice: event.data.object.amount_total / 100,
+      paymentMethodtype: "card",
+      isPaid: true,
+      paidAt: Date.now(),
+    });
+    if (order) {
+      const bulkOption = cart.cartItems.map((item) => ({
+        updateOne: {
+          filter: { _id: item.product },
+          update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+        },
+      }));
 
-    //     const bulkOption = cart.cartItems.map((item) => ({
-    //       updateOne: {
-    //         filter: { _id: item.product },
-    //         update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
-    //       },
-    //     }));
-
-    //     await Product.bulkWrite(bulkOption, {});
-    //     //5)clear user cart
-    //     await Cart.findByIdAndDelete(event.data.object.client_reference_id);
-    //   }
+      await Product.bulkWrite(bulkOption, {});
+      //     //5)clear user cart
+      await Cart.findByIdAndDelete(event.data.object.client_reference_id);
+    }
   }
 
-  // res.status(200).json({ received: "success" });
+  res.status(200).json({ received: "success" });
+
 
 };
