@@ -153,8 +153,36 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     return;
   }
   if (event.type === "checkout.session.completed") {
-    console.log("create order here................")
-    console.log("..........", event);
+    //create order
+    const cart = await Cart.findById(event.data.object.client_reference_id);
+    if (!cart) {
+      return next(new ApiError("Cart Not Found", 404));
+    }
+    const order = await Order.create({
+      user: req.user._id,
+      cartItems: cart.cartItems,
+      shippingAddress: event.data.object.metadata,
+      totalOrderPrice: event.data.object.amount_total /100,
+      paymentMethodtype: "cash",
+      isPaid: true,
+      paidAt: Date.now(),
+    });
+    if (!order) {
+      return next(new ApiError("Order Not Found", 404));
+    }
+    const bulkOption = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+      },
+    }));
+
+    await Product.bulkWrite(bulkOption, {});
+    //5)clear user cart
+    await Cart.findByIdAndDelete(event.data.object.client_reference_id);
+
   }
+
+      res.status(200).json({ received: "success" });
 
 })
