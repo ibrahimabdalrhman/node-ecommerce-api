@@ -5,6 +5,7 @@ const ApiFeatures = require("../utils/apiFeatures");
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
+const User = require("../models/userModel");
 const factory = require("../services/handersFactory");
 
 exports.createCashOrder = asyncHandler(async (req, res, next) => {
@@ -152,14 +153,17 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     res.status(400).send(`Webhook Error: ${err.message}`);
     return;
   }
-  if (event.type === "checkout.session.completed") {
+  if (event.type == "checkout.session.completed") {
     //create order
     const cart = await Cart.findById(event.data.object.client_reference_id);
     if (!cart) {
       return next(new ApiError("Cart Not Found", 404));
     }
+    const user = await User.findOne({
+      email: event.data.object.customer_email,
+    });
     const order = await Order.create({
-      user: req.user._id,
+      user: user._id,
       cartItems: cart.cartItems,
       shippingAddress: event.data.object.metadata,
       totalOrderPrice: event.data.object.amount_total /100,
