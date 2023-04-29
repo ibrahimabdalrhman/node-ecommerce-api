@@ -23,7 +23,7 @@ app.use(compression());
 
 //Check Webhoob
 app.post(
-  "/webhook",
+  "/webhook", express.raw({type: 'application/json'}),
   webhookCheckout
 );
 
