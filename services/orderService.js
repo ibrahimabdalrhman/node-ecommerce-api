@@ -151,7 +151,7 @@ exports.webhookCheckout = async (req, res) => {
     console.log("body : ", req.body);
 
     event = stripe.webhooks.constructEvent(
-      req.body,
+      Buffer.from(JSON.stringify(req.body), "base64").toString("utf8"),
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
