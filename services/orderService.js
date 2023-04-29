@@ -139,6 +139,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 });
 
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
+  console.log("webhookCheckout 1");
   const sig = req.headers["stripe-signature"];
 
   let event;

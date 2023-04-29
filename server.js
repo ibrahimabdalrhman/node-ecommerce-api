@@ -23,8 +23,8 @@ app.use(compression());
 
 //Check Webhoob
 app.post(
-  "/webhook",(req,res,next)=>{console.log("webhook----------------");}
-//   webhookCheckout
+  "/webhook",
+  webhookCheckout
 );
 
 app.use(express.static(path.join(__dirname, 'uploads')));
