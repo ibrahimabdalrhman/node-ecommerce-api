@@ -138,7 +138,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", data: session });
 });
 
-exports.webhookCheckout = asyncHandler(async (req, res, next) => {
+exports.webhookCheckout = async (req, res, next) => {
   console.log("webhookCheckout 1");
 
   const sig = req.headers["stripe-signature"];
@@ -193,4 +193,4 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
 
   // res.status(200).json({ received: "success" });
 
-});
+};
