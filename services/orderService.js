@@ -191,7 +191,7 @@ exports.webhookCheckout = async (req, res) => {
       await Cart.findByIdAndDelete(event.data.object.client_reference_id);
     }
   }
-
+console.log("order : ",order);
   res.status(200).json({ received: "success" });
 
 
