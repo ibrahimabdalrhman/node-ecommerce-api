@@ -150,11 +150,12 @@ exports.webhookCheckout = async (req, res) => {
     console.log("in try");
     console.log("body : ", req.body);
 
-   event = stripe.webhooks.constructEvent(
-     req.body,
-     sig,
-     "whsec_ZbTMDNlfx2xNl7W1FEe8zO18B4WS4zEG"
-   );
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+
     console.log("event : ", event);
   } catch (err) {
     console.log("ERROR ==>> ", err.message);
@@ -164,38 +165,39 @@ exports.webhookCheckout = async (req, res) => {
   if (event.type === "checkout.session.completed") {
 
     console.log("create order here.................");
+    console.log("cartId : ",event.data.object.client_reference_id);
 
     //create order
-    const cart = await Cart.findById(event.data.object.client_reference_id);
-    if (!cart) {
-      return next(new ApiError("Cart Not Found", 404));
-    }
-    const user = await User.findOne({
-      email: event.data.object.customer_email,
-    });
-    const order = await Order.create({
-      user: user._id,
-      cartItems: cart.cartItems,
-      shippingAddress: event.data.object.metadata,
-      totalOrderPrice: event.data.object.amount_total / 100,
-      paymentMethodtype: "card",
-      isPaid: true,
-      paidAt: Date.now(),
-    });
-    if (order) {
-      const bulkOption = cart.cartItems.map((item) => ({
-        updateOne: {
-          filter: { _id: item.product },
-          update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
-        },
-      }));
+  //   const cart = await Cart.findById(event.data.object.client_reference_id);
+  //   if (!cart) {
+  //     return next(new ApiError("Cart Not Found", 404));
+  //   }
+  //   const user = await User.findOne({
+  //     email: event.data.object.customer_email,
+  //   });
+  //   const order = await Order.create({
+  //     user: user._id,
+  //     cartItems: cart.cartItems,
+  //     shippingAddress: event.data.object.metadata,
+  //     totalOrderPrice: event.data.object.amount_total / 100,
+  //     paymentMethodtype: "card",
+  //     isPaid: true,
+  //     paidAt: Date.now(),
+  //   });
+  //   if (order) {
+  //     const bulkOption = cart.cartItems.map((item) => ({
+  //       updateOne: {
+  //         filter: { _id: item.product },
+  //         update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+  //       },
+  //     }));
 
-      await Product.bulkWrite(bulkOption, {});
-      //     //5)clear user cart
-      await Cart.findByIdAndDelete(event.data.object.client_reference_id);
-    }
-    console.log("order : ", order);
-  res.status(200).json({ received: "success" });
+  //     await Product.bulkWrite(bulkOption, {});
+  //     //     //5)clear user cart
+  //     await Cart.findByIdAndDelete(event.data.object.client_reference_id);
+  //   }
+  //   console.log("order : ", order);
+  // res.status(200).json({ received: "success" });
   }
 
 };
