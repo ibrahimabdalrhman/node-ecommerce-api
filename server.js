@@ -9,13 +9,10 @@ const ApiError = require("./utils/apiError");
 const errorMiddleware = require('./middlewares/errorMiddleware');
 require('mongoose').set('strictQuery', false);
 const { webhookCheckout } = require('./services/orderService');
-const bodyParser = require("body-parser");
 
 const app = express();
 dbConnection();
 app.use(express.json());
-app.use(bodyParser.raw({ type: "*/*" }));
-app.use(bodyParser.json());
 
 //enable others domans to access your api
 app.use(cors());
@@ -26,7 +23,7 @@ app.use(compression());
 
 //Check Webhoob
 app.post(
-    "/webhook-checkout", 
+    "/webhook-checkout", express.raw({ type: 'application/json' }),
     webhookCheckout
 );
 
