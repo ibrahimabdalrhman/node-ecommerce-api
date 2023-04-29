@@ -23,9 +23,9 @@ app.use(compression());
 
 //Check Webhoob
 app.post(
-    "/webhook-checkout",
-    express.raw({ type: "application/json" }),
-    webhookCheckout
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
 );
 
 app.use(express.static(path.join(__dirname, 'uploads')));
