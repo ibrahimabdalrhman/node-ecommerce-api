@@ -151,9 +151,9 @@ exports.webhookCheckout = async (req, res) => {
 
 
     event = stripe.webhooks.constructEvent(
-      req.body,
+      req.rawBody.toString(),
       sig,
-      'whsec_ZbTMDNlfx2xNl7W1FEe8zO18B4WS4zEG'
+      "whsec_ZbTMDNlfx2xNl7W1FEe8zO18B4WS4zEG"
     );
     console.log("event : ", event);
   } catch (err) {
