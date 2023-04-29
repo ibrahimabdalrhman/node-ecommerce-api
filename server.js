@@ -4,15 +4,22 @@ const dotenv = require('dotenv');
 const cors = require("cors");
 const compression = require("compression");
 dotenv.config({ path: 'config.env' });
+const rateLimit = require("express-rate-limit");
 const dbConnection = require('./config/database');
 const ApiError = require("./utils/apiError");
 const errorMiddleware = require('./middlewares/errorMiddleware');
 require('mongoose').set('strictQuery', false);
 const { webhookCheckout } = require('./services/orderService');
+const hpp = require('hpp');
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 
 const app = express();
 dbConnection();
-app.use(express.json());
+app.use(express.json({ limit: '20kb' }));
+
+app.use(mongoSanitize());
+
 
 //enable others domans to access your api
 app.use(cors());
@@ -20,6 +27,8 @@ app.options("*", cors());
 
 //compress all responses
 app.use(compression());
+
+app.use(xss());
 
 //Check Webhoob
 app.post(
@@ -34,6 +43,22 @@ console.log("mode : ", process.env.NODE_ENV);
 const mountRoute = require('./routes');
 const { log } = require('console');
 mountRoute(app);
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    message:
+        "Too many accounts created from this IP, please try again after an hour",
+});
+
+// Apply the rate limiting middleware to API calls only
+app.use("/api", apiLimiter);
+
+app.use(
+    hpp({
+        whitelist: ["ratingsAverage", "ratingsQuantity", "quantity", 'sold', 'price'],
+    })
+); // <- THIS IS THE NEW LINE
 
 //404 error if not found page
 app.all('*', (req,res,next) => {

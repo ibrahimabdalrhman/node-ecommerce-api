@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const ApiError = require("../utils/apiError");
 const User = require("../models/userModel");
 const sendEmail = require('../utils/sendEmail');
+const {sanatizeUser } = require('../utils/sanatizeData');
 
 const createToken = (payload) =>
   jwt.sign({ userId: payload }, process.env.JWT_KEY, {
@@ -20,7 +21,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
   });
   const token =  createToken(user._id);
   
-  res.status(201).json({ data: user, token });
+  res.status(201).json({ data: sanatizeUser(user), token });
 });
 
 exports.login = asyncHandler(async (req, res, next) => {
@@ -31,7 +32,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   if (await bcrypt.compare(req.body.password, user.password)) {
   // if (req.body.password==user.password) {
     const token = createToken(user._id);
-    return res.status(201).json({ data: user, token });
+    return res.status(201).json({ data:sanatizeUser(user), token });
   };
   return next(new ApiError("incorrect password",401));
 });
