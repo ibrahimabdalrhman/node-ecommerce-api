@@ -8,6 +8,7 @@ const dbConnection = require('./config/database');
 const ApiError = require("./utils/apiError");
 const errorMiddleware = require('./middlewares/errorMiddleware');
 require('mongoose').set('strictQuery', false);
+const { webhookCheckout } = require('./services/orderService');
 
 const app = express();
 dbConnection();
@@ -19,6 +20,9 @@ app.options("*", cors());
 
 //compress all responses
 app.use(compression());
+
+//Check Webhoob
+app.post("/webhook-checkout", express.raw({ type: "application/json" }),webhookCheckout);
 
 app.use(express.static(path.join(__dirname, 'uploads')));
 console.log("mode : ", process.env.NODE_ENV);
