@@ -148,14 +148,17 @@ exports.webhookCheckout = async (req, res) => {
 
   try {
     console.log("in try");
-    console.log("body : ", req.body);
 
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET
+      "whsec_ZbTMDNlfx2xNl7W1FEe8zO18B4WS4zEG",
+      {
+        // Specify that the raw body should be used instead of the parsed body
+        // when constructing the event
+        rawBody: req.rawBody,
+      }
     );
-
     console.log("event : ", event);
   } catch (err) {
     console.log("ERROR ==>> ", err.message);
