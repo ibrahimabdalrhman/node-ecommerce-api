@@ -147,10 +147,11 @@ exports.webhookCheckout = async (req, res, next) => {
   let event;
 
   try {
+    console.log("in try");
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET
+      whsec_POSrOt1uWxNvqH9DVlysJI3nRV6qrzTs
     );
     console.log("event : ",event);
   } catch (err) {
