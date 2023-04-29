@@ -148,10 +148,11 @@ exports.webhookCheckout = async (req, res) => {
 
   try {
     console.log("in try");
-
+    const rawBody = req.rawBody.toString();
+    console.log("body : ", rawBody);
 
     event = stripe.webhooks.constructEvent(
-      req.rawBody.toString(),
+      rawBody,
       sig,
       "whsec_ZbTMDNlfx2xNl7W1FEe8zO18B4WS4zEG"
     );
