@@ -23,9 +23,8 @@ app.use(compression());
 
 //Check Webhoob
 app.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  webhookCheckout
+  "/webhook",(req,res,next)=>{console.log("webhook----------------");}
+//   webhookCheckout
 );
 
 app.use(express.static(path.join(__dirname, 'uploads')));
@@ -33,6 +32,7 @@ console.log("mode : ", process.env.NODE_ENV);
 
 //routes
 const mountRoute = require('./routes');
+const { log } = require('console');
 mountRoute(app);
 
 //404 error if not found page
