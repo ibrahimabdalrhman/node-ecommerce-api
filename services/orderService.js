@@ -155,7 +155,7 @@ exports.webhookCheckout = async (req, res) => {
     );
     console.log("event : ",event);
   } catch (err) {
-    console.log(err);
+    console.log("ERROR =>",err);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
