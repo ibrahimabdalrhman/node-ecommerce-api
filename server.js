@@ -5,14 +5,14 @@ const cors = require("cors");
 const compression = require("compression");
 dotenv.config({ path: 'config.env' });
 const rateLimit = require("express-rate-limit");
+const hpp = require('hpp');
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 const dbConnection = require('./config/database');
 const ApiError = require("./utils/apiError");
 const errorMiddleware = require('./middlewares/errorMiddleware');
 require('mongoose').set('strictQuery', false);
 const { webhookCheckout } = require('./services/orderService');
-const hpp = require('hpp');
-const mongoSanitize = require("express-mongo-sanitize");
-const xss = require("xss-clean");
 
 const app = express();
 dbConnection();

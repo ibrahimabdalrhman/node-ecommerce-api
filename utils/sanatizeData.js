@@ -4,6 +4,7 @@ exports.sanatizeUser = function (user) {
     username: user.username,
     name: user.name,
     _id: user._id,
+    role: user.role,
   };
   
 };

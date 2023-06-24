@@ -8,6 +8,7 @@ const sendEmail = require('../utils/sendEmail');
 const {sanatizeUser } = require('../utils/sanatizeData');
 
 const createToken = (payload) =>
+  
   jwt.sign({ userId: payload }, process.env.JWT_KEY, {
     expiresIn: process.env.JWT_EXPIRE_TIME,
   });
@@ -39,6 +40,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
 //to check if user loggedin
 exports.auth = asyncHandler(async (req, res, next) => {
+  
   if (!req.headers.authorization) {
     return next(new ApiError("you must login to access this route ", 401));
   }

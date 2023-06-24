@@ -69,7 +69,6 @@ exports.getAll = (Model, modename = '') =>
       .fields();
 
     const doc = await apiFeatures.mongooseQuery;
-    console.log(doc);
     res.status(200).json({
       results: doc.length,
       page: page,

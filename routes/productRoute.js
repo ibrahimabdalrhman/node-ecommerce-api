@@ -13,6 +13,7 @@ const { auth, allowTo } = require("../services/authService");
 
 router.use("/:prodId/reviews", reviewRoute);
 
+ 
 router
   .route("/")
   .post(
@@ -23,7 +24,9 @@ router
     postProductValidator,
     productService.postProduct
   )
-  .get(productService.getProducts);
+  .get(
+    productService.getProducts
+  );
 
 router
   .route("/:id")
